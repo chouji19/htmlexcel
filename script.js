@@ -155,25 +155,29 @@ function onCellEdited(row, column) {
 			}
 		}
 	}
-	checkForCellsToUpdate(row, column, cellEditable);
+	checkForCellsToUpdate(row, column);
 }
 
 
 // update the value of the referred cells
 function getNewValue(cellEditable, row, column) {
 	let text = dataValues[row][column];
-	const newVal = getBasicFormula(text);
-
-	let regExp = /[a-z]/i;
-	if (regExp.test(newVal.toLowerCase())) {
-		cellEditable.innerHTML = 'Syntax Error';
+	if (isAFunction(text)) {
+		cellEditable.innerHTML = processFunctions(text);
 	} else {
-		const result = eval(newVal.replace('=', ''));
-		cellEditable.innerHTML = result;
+		const newVal = getBasicFormula(text);
+	
+		let regExp = /[a-z]/i;
+		if (regExp.test(newVal.toLowerCase())) {
+			cellEditable.innerHTML = 'Syntax Error';
+		} else {
+			const result = eval(newVal.replace('=', ''));
+			cellEditable.innerHTML = result;
+		}
 	}
 }
 // function to refresh cells with formulas related to the updated cell
-function checkForCellsToUpdate(row, column, cell) {
+function checkForCellsToUpdate(row, column) {
 	for (let i = 1; i < 100; i++) {
 
 		//check if the formula is somewhere in the grid
